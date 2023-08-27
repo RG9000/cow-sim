@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, utils::HashSet};
 
 #[derive(PartialEq, Copy, Clone, Debug)]
 pub enum Direction {
@@ -7,6 +7,15 @@ pub enum Direction {
     Right = 2,
     Up = 3,
     Down = 4
+}
+
+#[derive(PartialEq, Copy, Clone)]
+pub enum Goal {
+    Idle = 0,
+    Wonder = 1,
+    FindGrass = 2,
+    MoveTowardsTile = 3,
+    EatGrass = 4
 }
 
 
@@ -24,6 +33,12 @@ pub enum FloorType {
     Dirt = 6 
 }
 
+#[derive(Default, Resource)]
+pub struct DirtyTiles(pub Vec<((usize, usize), FloorType)>);
+
+#[derive(Default, Resource)]
+pub struct FloorMatrix(pub Vec<Vec<FloorType>>);
+
 #[derive(Component)]
 pub struct AnimationIndices {
     pub first: usize,
@@ -35,3 +50,4 @@ pub struct AnimationTimer(pub Timer);
 
 #[derive(Component, Deref, DerefMut)]
 pub struct DecisionTimer(pub Timer);
+
