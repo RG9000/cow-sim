@@ -18,27 +18,6 @@ pub enum Goal {
     EatGrass = 4
 }
 
-
-#[derive(PartialEq, Copy, Clone)]
-pub enum FloorType {
-    Grass = 14,
-    LeftTop = 26 ,
-    Top = 27,
-    RightTop = 28,
-    Right = 15,
-    RightBottom = 2,
-    Bottom = 1,
-    LeftBottom = 0,
-    Left = 13,
-    Dirt = 6 
-}
-
-#[derive(Default, Resource)]
-pub struct DirtyTiles(pub Vec<((usize, usize), FloorType)>);
-
-#[derive(Default, Resource)]
-pub struct FloorMatrix(pub Vec<Vec<FloorType>>);
-
 #[derive(Component)]
 pub struct AnimationIndices {
     pub first: usize,
