@@ -167,7 +167,7 @@
 //         TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 4,5, None, None);
 //     let texture_atlas_handle = texture_atlases.add(texture_atlas);
 //     for _i in 0..10 {
-//         let animation_indices = AnimationIndices { first: 16, last: 18 };
+//         let animation_indices = AnionIndices { first: 16, last: 18 };
 //         let mut rng = rand::thread_rng();
 //         commands.spawn(
 //                         (SpriteSheetBundle {
