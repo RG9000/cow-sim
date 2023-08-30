@@ -24,7 +24,6 @@ pub fn spawn_world(
     mut grid: ResMut<Grid>,
 
 ) {
-    println!("I'm in!");
     let texture_handle = asset_server.load("simple-tiles.png");
     let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(TILE_SIZE,TILE_SIZE), 13, 3, None, None);
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
