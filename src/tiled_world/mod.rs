@@ -100,8 +100,8 @@ fn manage_chunks(
         let mut chunks_to_load = Vec::new();
 
         // Determine which chunks to keep and which to load
-        for x in current_chunk_x - 2..=current_chunk_x + 2 {
-            for y in current_chunk_y - 2..=current_chunk_y + 2 {
+        for x in current_chunk_x - 2..=current_chunk_x + 1 {
+            for y in current_chunk_y - 1..=current_chunk_y + 2 {
                 chunks_to_keep.insert((x, y));
                 if !chunks.cells.contains_key(&(x, y)) {
                     chunks_to_load.push((x, y));
