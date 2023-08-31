@@ -28,6 +28,7 @@ fn main() {
     .insert_resource(ComponentGrid::default())
     .insert_resource(Grid::default())
     .insert_resource(DirtyTiles::default())
+    .insert_resource(Chunks::default())
     .add_plugin(TiledWorldPlugin)
     .add_startup_system(spawn_player)
     .add_startup_system(spawn_camera)

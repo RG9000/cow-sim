@@ -95,7 +95,7 @@ fn spawn_character(
         transform: Transform::from_xyz(x as f32*16.0, y as f32*16.0, 1.0),
         ..Default::default()
     });
-    entity_builder.insert(Character{run_speed: 60.0});
+    entity_builder.insert(Character{run_speed: 250.0});
     entity_builder.insert(AnimationIndices{first: 0, last: 7});
     entity_builder.insert(AnimationTimer(Timer::from_seconds(0.3, TimerMode::Repeating)));
 
@@ -103,34 +103,3 @@ fn spawn_character(
         entity_builder.insert(Player);
     } 
 }
-
-// pub fn spawn_cows(
-//     mut commands: Commands,
-//     asset_server: Res<AssetServer>,
-//     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-// ) {
-//     let texture_handle = asset_server.load("cow.png");
-//     let texture_atlas =
-//         TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 4,5, None, None);
-//     let texture_atlas_handle = texture_atlases.add(texture_atlas);
-//     for _i in 0..10 {
-//         let animation_indices = AnionIndices { first: 16, last: 18 };
-//         let mut rng = rand::thread_rng();
-//         commands.spawn(
-//                         (SpriteSheetBundle {
-//                             texture_atlas: texture_atlas_handle.clone(),
-//                             sprite: TextureAtlasSprite::new(0),
-//                             transform: Transform::from_xyz(rng.gen_range(0.0..50.0)*16.0, rng.gen_range(0.0..50.0)*16.0, 1.0),
-//                             ..default()
-//                         },
-//                         animation_indices,
-//                         AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
-//                         DecisionTimer(Timer::from_seconds(1.0, TimerMode::Repeating)),
-//                         Hunger{hungriness: 0.0},
-//                         GoalHaver{goal: Goal::Wonder, goal_location: Vec2::new(0.0,0.0)},
-//                         GrassEater{},
-//                         Cow{target_direction: Direction::None}));
-
-//     }
-
-// }

@@ -4,59 +4,19 @@ use bevy::{prelude::*, utils::HashSet};
 use noise::Perlin;
 use utils::*;
 
+use crate::character::utils::Player;
+
 pub struct TiledWorldPlugin;
 
 impl Plugin for TiledWorldPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(spawn_world)
-           .add_system(recalculate_world);
+        app
+           .add_system(manage_chunks);
     }
 }
 
-pub const WORLD_SIZE : usize = 100;
+pub const CHUNK_SIZE : usize = 100;
 pub const TILE_SIZE  : f32 = 16.0;
-
-pub fn spawn_world(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-    mut component_grid: ResMut<ComponentGrid>,
-    mut grid: ResMut<Grid>,
-
-) {
-    let texture_handle = asset_server.load("simple-tiles.png");
-    let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(TILE_SIZE,TILE_SIZE), 13, 3, None, None);
-    let texture_atlas_handle = texture_atlases.add(texture_atlas);
-    let perlin = Perlin::new(1);
-
-    match perlin_to_floor_types(perlin, WORLD_SIZE, WORLD_SIZE) {
-        Ok(matrix) => {
-            for y in 0..WORLD_SIZE {
-                for x in 0..WORLD_SIZE {
-                    let entity = commands
-                        .spawn(SpriteSheetBundle {
-                            texture_atlas: texture_atlas_handle.clone(),
-                            sprite: TextureAtlasSprite::new(matrix[y][x] as usize),
-                            transform: Transform::from_xyz((x as f32) * TILE_SIZE, (y as f32) * TILE_SIZE, 0.0),
-                            ..Default::default()
-                        })
-                        .insert(Floor {floor_type: matrix[y][x]})
-                        .id();
-
-                    component_grid.cells
-                        .entry((x as usize, y as usize))
-                        .or_insert_with(Vec::new)
-                        .push(entity);
-
-                    grid.cells
-                        .entry((x as usize, y as usize))
-                        .insert(matrix[y][x]);
-                }
-            }
-        }
-        Err(_) => println!("An error occurred."),
-    }
-}
 
 pub fn recalculate_world(
     mut dirty_tiles: ResMut<DirtyTiles>,
@@ -119,4 +79,46 @@ pub fn recalculate_world(
 
 
     dirty_tiles.0.clear();
+}
+
+fn manage_chunks(
+    mut commands: Commands,
+    player_query: Query<&Transform, With<Player>>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    asset_server: Res<AssetServer>,
+    mut chunks: ResMut<Chunks>
+) {
+    for transform in player_query.iter() {
+        let player_x = transform.translation.x;
+        let player_y = transform.translation.y;
+
+        let current_chunk_x = (player_x / TILE_SIZE / CHUNK_SIZE as f32) as i32;
+        let current_chunk_y = (player_y / TILE_SIZE / CHUNK_SIZE as f32) as i32;
+
+        // Load current and adjacent chunks, unload others
+        let mut chunks_to_keep = HashSet::new();
+        let mut chunks_to_load = Vec::new();
+
+        // Determine which chunks to keep and which to load
+        for x in current_chunk_x - 2..=current_chunk_x + 2 {
+            for y in current_chunk_y - 2..=current_chunk_y + 2 {
+                chunks_to_keep.insert((x, y));
+                if !chunks.cells.contains_key(&(x, y)) {
+                    chunks_to_load.push((x, y));
+                }
+            }
+        }
+
+        // Load new chunks
+        for (x, y) in chunks_to_load.iter() {
+            load_chunk(&mut commands, &mut chunks, &mut texture_atlases, &asset_server, *x, *y);
+        }
+
+        // Unload old chunks
+        let chunks_to_unload: Vec<_> = chunks.cells.keys().filter(|&k| !chunks_to_keep.contains(k)).cloned().collect();
+        for k in chunks_to_unload {
+            unload_chunk(&mut commands, &mut chunks, k);
+        }
+
+    }
 }
